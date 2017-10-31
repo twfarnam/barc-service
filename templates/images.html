@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Images</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" type="image/png" href="/static/icon.png">
+  </head>
+  <body>
+    <h1>Images</h1>
+    {% for i in images %}
+      <div class=image>
+        <img src="images/{{ i.id }}.jpg">
+        <div class=chatter>
+          <div class=result>{{ i.result }}</div>
+          <div class=time>{{ i.created_at|datetime }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  </body>
+</html>
