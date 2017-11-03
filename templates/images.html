@@ -11,7 +11,10 @@
       <div class=image>
         <img src="images/{{ i.id }}.jpg">
         <div class=chatter>
-          <div class=result>{{ i.result }}</div>
+          <div class=result>
+            {{ i.result }}
+            ({{ i.score|percent }})
+          </div>
           <div class=time>{{ i.created_at|datetime }}</div>
         </div>
       </div>

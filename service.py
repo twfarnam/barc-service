@@ -26,7 +26,11 @@ app.config.update(dict(
 def format_datetime(value):
     return dateutil.parser.parse(value).strftime('%b %d, %Y %-I:%M %p')
 
+def format_percent(value):
+    return str(int(float(value) * 100)) + '%'
+
 app.jinja_env.filters['datetime'] = format_datetime
+app.jinja_env.filters['percent'] = format_percent
 
 model_dir = os.path.join(app.root_path, 'inception')
 
@@ -181,26 +185,32 @@ def upload_file():
         )
         file.save(filename)
 
-        caption_id, score = run_inference_on_image(filename)
-
-        if score > .5:
-            cursor.execute(
-                "SELECT id, caption FROM captions WHERE id == ?",
-                (caption_id,)
-            )
-
-            result = cursor.fetchone()[1]
-
-            cursor.execute(
-               "UPDATE images SET result = ? WHERE id = ?",
-               (result, image_id)
-            )
-
+        try:
+            caption_id, score = ai(filename)
+        except Exception as detail:
+            print "AI error:", detail
             db.commit()
-            return flask.jsonify(id=image_id, result=result)
+            return flask.jsonify(result=None)
 
-        else:
-            return flask.jsonify(id=image_id, result=None, score=score)
+        cursor.execute(
+            "SELECT id, caption FROM captions WHERE id == ?",
+            (caption_id,)
+        )
+
+        result = cursor.fetchone()[1]
+
+        print 'AI found: ', result, score
+
+        cursor.execute(
+           "UPDATE images SET result = ?, score = ? WHERE id = ?",
+           (result, str(score), image_id)
+        )
+
+        db.commit()
+
+        first_result = result.split(',')[0]
+
+        return flask.jsonify(result=(first_result if score >= .3 else None))
 
     # GET will be API JSON response
     else:
@@ -216,50 +226,35 @@ def send_js(path):
 
 # AI
 
-def create_graph():
-  filename = os.path.join(model_dir, 'classify_image_graph_def.pb')
-  with tf.gfile.FastGFile(filename, 'rb') as f:
-    graph_def = tf.GraphDef()
-    graph_def.ParseFromString(f.read())
-    tf.import_graph_def(graph_def, name='')
-
+# loads the saved nueral net (GraphDef) from a file
 filename = os.path.join(model_dir, 'classify_image_graph_def.pb')
 graph_def = tf.GraphDef()
 with tf.gfile.FastGFile(filename, 'rb') as f:
     graph_def.ParseFromString(f.read())
 
+tf.import_graph_def(graph_def, name='')
+sess = tf.Session()
 
 
-def run_inference_on_image(image):
+def ai(image):
 
   if not tf.gfile.Exists(image):
     tf.logging.fatal('File does not exist %s', image)
 
   image_data = tf.gfile.FastGFile(image, 'rb').read()
 
-  # XXX 
-  # want to run this only once instead of on every request but somehow the
-  # default graph is getting reset before we can use it
-  tf.import_graph_def(graph_def, name='')
+  # 'softmax:0': A tensor containing the normalized prediction across
+  #   1000 labels.
+  softmax_tensor = sess.graph.get_tensor_by_name('softmax:0')
 
-  with tf.Session() as sess:
-    # Some useful tensors:
-    # 'softmax:0': A tensor containing the normalized prediction across
-    #   1000 labels.
-    # 'pool_3:0': A tensor containing the next-to-last layer containing 2048
-    #   float description of the image.
-    # 'DecodeJpeg/contents:0': A tensor containing a string providing JPEG
-    #   encoding of the image.
-    # Runs the softmax tensor by feeding the image_data as input to the graph.
-    softmax_tensor = sess.graph.get_tensor_by_name('softmax:0')
-
-    predictions = sess.run(
+  predictions = sess.run(
         softmax_tensor,
         {'DecodeJpeg/contents:0': image_data}
-    )
+  )
 
-    predictions = np.squeeze(predictions)
+  predictions = np.squeeze(predictions)
 
-    n = predictions.argsort()[-1]
-    return n, predictions[n]
+  n = predictions.argsort()[-1]
+  return n, predictions[n]
+
 
