@@ -10,11 +10,11 @@ from six.moves import urllib
 
 # SETUP
 
-app = flask.Flask(__name__)
+application = flask.Flask(__name__)
 
-app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'barc.db'),
-    UPLOAD_FOLDER=os.path.join(app.root_path, 'images'),
+application.config.update(dict(
+    DATABASE=os.path.join(application.root_path, 'barc.db'),
+    UPLOAD_FOLDER=os.path.join(application.root_path, 'images'),
 ))
 
 def format_datetime(value):
@@ -24,13 +24,13 @@ def format_percent(value):
     if value == '': return 0
     return str(int(float(value) * 100)) + '%'
 
-app.jinja_env.filters['datetime'] = format_datetime
-app.jinja_env.filters['percent'] = format_percent
+application.jinja_env.filters['datetime'] = format_datetime
+application.jinja_env.filters['percent'] = format_percent
 
-model_dir = os.path.join(app.root_path, 'inception')
+model_dir = os.path.join(application.root_path, 'inception')
 
 def connect_db():
-    rv = sqlite3.connect(app.config['DATABASE'])
+    rv = sqlite3.connect(application.config['DATABASE'])
     rv.row_factory = sqlite3.Row
     return rv
 
@@ -38,15 +38,15 @@ def get_db():
     if not hasattr(flask.g, 'sqlite_db'): flask.g.sqlite_db = connect_db()
     return flask.g.sqlite_db
 
-@app.teardown_appcontext
+@application.teardown_appcontext
 def close_db(error):
     if hasattr(flask.g, 'sqlite_db'): flask.g.sqlite_db.close()
 
 # creates a fresh database, downloads inception, and loads the caption codes
-@app.cli.command('init')
+@application.cli.command('init')
 def init_command():
     db = get_db()
-    with app.open_resource('schema.sql', mode='r') as f:
+    with application.open_resource('schema.sql', mode='r') as f:
         db.cursor().executescript(f.read())
     db.commit()
     print('Initialized new database.')
@@ -70,7 +70,7 @@ def authenticate():
     )
 
 
-@app.route('/')
+@application.route('/')
 def ui():
     auth = flask.request.authorization
     if not auth or not check_auth(auth.username, auth.password):
@@ -84,7 +84,7 @@ def ui():
     return flask.render_template('images.html', images=images)
 
 
-@app.route('/api/images', methods=['GET', 'POST'])
+@application.route('/api/images', methods=['GET', 'POST'])
 def upload_file():
 
     # Poor man's token authentication
@@ -109,7 +109,7 @@ def upload_file():
         )
         image_id = cursor.lastrowid
         filename = os.path.join(
-            app.config['UPLOAD_FOLDER'],
+            application.config['UPLOAD_FOLDER'],
             str(image_id) + '.jpg'
         )
         file.save(filename)
@@ -139,7 +139,7 @@ def upload_file():
         flask.abort(404)
 
 
-@app.route('/images/<path:path>')
+@application.route('/images/<path:path>')
 def send_js(path):
     return flask.send_from_directory('images', path)
 
