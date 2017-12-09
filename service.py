@@ -1,20 +1,14 @@
 import os
+import json
 import flask
 import sqlite3
 import datetime
-import dateutil.parser # pip install python-dateutil
-import sys
-import re
-import tarfile
-import tensorflow as tf
-import numpy as np
+import dateutil.parser
+from keras.models import load_model
+from keras.preprocessing.image import load_img, img_to_array
 from six.moves import urllib
 
-
 # SETUP
-
-# removes TensorFlow verbose messages
-os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 app = flask.Flask(__name__)
 
@@ -27,6 +21,7 @@ def format_datetime(value):
     return dateutil.parser.parse(value).strftime('%b %d, %Y %-I:%M %p')
 
 def format_percent(value):
+    if value == '': return 0
     return str(int(float(value) * 100)) + '%'
 
 app.jinja_env.filters['datetime'] = format_datetime
@@ -55,72 +50,6 @@ def init_command():
         db.cursor().executescript(f.read())
     db.commit()
     print('Initialized new database.')
-
-    DATA_URL = 'http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz'
-
-    model_dir = os.path.join(app.root_path, 'inception')
-
-    if not os.path.exists(model_dir):
-      os.makedirs(model_dir)
-
-    filename = DATA_URL.split('/')[-1]
-    filepath = os.path.join(model_dir, filename)
-    if not os.path.exists(filepath):
-      def _progress(count, block_size, total_size):
-        sys.stdout.write('\r>> Downloading %s %.1f%%' % (
-            filename, float(count * block_size) / float(total_size) * 100.0))
-        sys.stdout.flush()
-      filepath, _ = urllib.request.urlretrieve(DATA_URL, filepath, _progress)
-      print()
-      statinfo = os.stat(filepath)
-      print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
-    tarfile.open(filepath, 'r:gz').extractall(model_dir)
-
-    # Load mapping from string UID to human-readable string. File like:
-    #      n00004475	organism, being
-    uid_to_human = {}
-    uid_lookup_path = os.path.join(
-        model_dir,
-        'imagenet_synset_to_human_label_map.txt'
-    )
-    p = re.compile(r'[n\d]*[ \S,]*')
-    for line in tf.gfile.GFile(uid_lookup_path).readlines():
-      parsed_items = p.findall(line)
-      uid = parsed_items[0]
-      human_string = parsed_items[2]
-      uid_to_human[uid] = human_string
-
-    # Load mapping from string UID to integer node ID. File looks like:
-    #     entry {
-    #       target_class: 449
-    #       target_class_string: "n01440764"
-    #     }
-    node_id_to_uid = {}
-    label_lookup_path = os.path.join(
-        model_dir,
-        'imagenet_2012_challenge_label_map_proto.pbtxt'
-    )
-    for line in tf.gfile.GFile(label_lookup_path).readlines():
-      if line.startswith('  target_class:'):
-        target_class = int(line.split(': ')[1])
-      if line.startswith('  target_class_string:'):
-        target_class_string = line.split(': ')[1]
-        node_id_to_uid[target_class] = target_class_string[1:-2]
-
-    cursor = db.cursor()
-
-    # Final mapping of integer node ID to human-readable string
-    for key, val in node_id_to_uid.items():
-      if val not in uid_to_human:
-        tf.logging.fatal('Failed to locate: %s', val)
-      cursor.execute(
-        "INSERT INTO captions ('id', 'caption') VALUES (?, ?)",
-        (key, uid_to_human[val])
-      )
-
-    db.commit()
-
-
 
 
 
@@ -186,18 +115,11 @@ def upload_file():
         file.save(filename)
 
         try:
-            caption_id, score = ai(filename)
+            result, score = ai(filename)
         except Exception as detail:
             print "AI error:", detail
             db.commit()
             return flask.jsonify(result=None)
-
-        cursor.execute(
-            "SELECT id, caption FROM captions WHERE id == ?",
-            (caption_id,)
-        )
-
-        result = cursor.fetchone()[1]
 
         print 'AI found: ', result, score
 
@@ -223,38 +145,25 @@ def send_js(path):
 
 
 
-
 # AI
 
-# loads the saved nueral net (GraphDef) from a file
-filename = os.path.join(model_dir, 'classify_image_graph_def.pb')
-graph_def = tf.GraphDef()
-with tf.gfile.FastGFile(filename, 'rb') as f:
-    graph_def.ParseFromString(f.read())
+model = load_model('model/nn.h5')
 
-tf.import_graph_def(graph_def, name='')
-sess = tf.Session()
+# https://github.com/fchollet/keras/issues/6462
+model._make_predict_function()
 
+with open('model/labels.json', 'r') as fp:
+    labels = json.load(fp)
 
 def ai(image):
+    img = load_img(image, target_size=(224, 224))
+    data = img_to_array(img)
+    data = data.reshape((1,) + data.shape)
 
-  if not tf.gfile.Exists(image):
-    tf.logging.fatal('File does not exist %s', image)
+    prediction = model.predict(data)
 
-  image_data = tf.gfile.FastGFile(image, 'rb').read()
+    label = labels[prediction.argmax(axis=-1)[0]]
+    value = prediction[0][prediction.argmax(axis=-1)[0]]
 
-  # 'softmax:0': A tensor containing the normalized prediction across
-  #   1000 labels.
-  softmax_tensor = sess.graph.get_tensor_by_name('softmax:0')
-
-  predictions = sess.run(
-        softmax_tensor,
-        {'DecodeJpeg/contents:0': image_data}
-  )
-
-  predictions = np.squeeze(predictions)
-
-  n = predictions.argsort()[-1]
-  return n, predictions[n]
-
+    return label, value
 

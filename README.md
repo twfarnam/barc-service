@@ -1,5 +1,5 @@
 
-To download imagenet and create a fresh databse:
+To create a fresh databse:
     FLASK_APP=service.py flask init
 
 To run in development mode:
