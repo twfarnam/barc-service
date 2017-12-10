@@ -13,6 +13,7 @@ To do a test upload with CURL:
 
 To run in production:
 
+    pip install -r requirements.txt
     BARC_USERNAME=admin BARC_PASSWORD=secret uwsgi --ini service.ini --plugin python
 
 
