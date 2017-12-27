@@ -6,6 +6,7 @@ import datetime
 import dateutil.parser
 from keras.models import load_model
 from keras.preprocessing.image import load_img, img_to_array
+from keras.applications.inception_v3 import preprocess_input
 from six.moves import urllib
 
 # SETUP
@@ -156,9 +157,10 @@ with open('model/labels.json', 'r') as fp:
     labels = json.load(fp)
 
 def ai(image):
-    img = load_img(image, target_size=(224, 224))
+    img = load_img(image, target_size=(299, 299))
     data = img_to_array(img)
     data = data.reshape((1,) + data.shape)
+    data = preprocess_input(data)
 
     prediction = model.predict(data)
 
