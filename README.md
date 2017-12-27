@@ -16,4 +16,8 @@ To run in production:
     pip install -r requirements.txt
     BARC_USERNAME=admin BARC_PASSWORD=secret uwsgi --ini service.ini --plugin python
 
+To test production service with a training file:
+
+    curl -F "file=@../training/data/validation/pumpkin_armoire/90.jpg" -H "Authorization: Token token=secret" https://barc.squids.online/api/images
+
 

@@ -131,7 +131,7 @@ def upload_file():
 
         db.commit()
 
-        first_result = result.split(',')[0]
+        first_result = result.replace('_',' ')
 
         return flask.jsonify(result=(first_result if score >= .3 else None))
 
