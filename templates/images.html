@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Images</title>
+    <title>Barc</title>
     <link rel="stylesheet" href="static/style.css">
     <link rel="icon" type="image/png" href="/static/icon.png">
   </head>
@@ -11,11 +11,11 @@
       <div class=image>
         <img src="images/{{ i.id }}.jpg">
         <div class=chatter>
-          <div class=result>
-            {{ i.result }}
-            ({{ i.score|percent }})
-          </div>
+          <div class=result>{{ i.result|result }}</div>
           <div class=time>{{ i.created_at|datetime }}</div>
+          <div>{{ i.latency }}ms</div>
+          <div>IP: {{ i.ip_address }}</div>
+          <div>Device ID: {{ i.device_id }}</div>
         </div>
       </div>
     {% endfor %}

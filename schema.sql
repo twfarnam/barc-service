@@ -3,17 +3,10 @@ drop table if exists images;
 
 create table images(
   id integer primary key autoincrement,
-  result text not null default '',
-  score text not null default '',
-  created_at text not null
+  created_at text not null,
+  result text,
+  latency int,
+  device_id text,
+  ip_address text
 );
-
-
-drop table if exists captions;
-
-create table captions(
-  id integer primary key,
-  caption text not null
-);
-
 
