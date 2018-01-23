@@ -161,7 +161,7 @@ def ui():
     db = get_db()
     cursor = db.cursor()
     images = cursor.execute(
-        'SELECT * FROM images ORDER BY created_at DESC LIMIT 1000'
+        'SELECT * FROM images ORDER BY id DESC LIMIT 1000'
     )
     return flask.render_template('images.html', images=images)
 
@@ -180,16 +180,21 @@ def upload_file():
         if 'file' not in flask.request.files:
             flask.abort(422)
 
-        if 'device_id' not in flask.request.form:
-            flask.abort(422)
+        # if 'device_id' not in flask.request.form:
+        #     flask.abort(422)
 
         file = flask.request.files['file']
 
         if not file or not file.filename.lower().endswith('.jpg'):
             flask.abort(422)
 
+
+        device_id = None
+        if 'device_id' in flask.request.form:
+            device_id = flask.request.form['device_id']
+
         image_id = add_image(
-            device_id=flask.request.form['device_id'],
+            device_id=device_id, 
             ip_address=flask.request.remote_addr
         )
 
@@ -270,5 +275,4 @@ def ai(image):
 if __name__ == '__main__':
     load_nn()
     app.run(port=5000, host='0.0.0.0')
-    # app.run(debug=True, port=5000, host='0.0.0.0')
 
