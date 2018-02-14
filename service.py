@@ -180,18 +180,15 @@ def upload_file():
         if 'file' not in flask.request.files:
             flask.abort(422)
 
-        # if 'device_id' not in flask.request.form:
-        #     flask.abort(422)
+        if 'device_id' not in flask.request.form:
+            flask.abort(422)
 
         file = flask.request.files['file']
 
         if not file or not file.filename.lower().endswith('.jpg'):
             flask.abort(422)
 
-
-        device_id = None
-        if 'device_id' in flask.request.form:
-            device_id = flask.request.form['device_id']
+        device_id = flask.request.form['device_id']
 
         image_id = add_image(
             device_id=device_id, 
