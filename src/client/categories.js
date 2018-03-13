@@ -1,5 +1,14 @@
 
-export default [
+export var rooms = [
+  "bedroom",
+  "dining_room",
+  "foyer",
+  "hallway",
+  "living_room",
+  "pumpkin",
+]
+
+export var categories = [
   "bedroom_armoire",
   "bedroom_bathroom_hallway",
   "bedroom_cane_hook",

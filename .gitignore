@@ -1,11 +1,9 @@
 
 barc.db
-images/
-model/
 *.pyc
-
 .DS_Store
-node_modules/
-/dist/
-/src/client/test/unit/coverage/
+/images/
+/model/
+/node_modules/
+/import/
 

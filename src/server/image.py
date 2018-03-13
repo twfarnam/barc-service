@@ -1,9 +1,11 @@
 import flask
+import json
 import os
 from flask.views import MethodView
 
 from db import get_db
 from helpers import token_auth, simple_auth, authorize
+
 
 
 class ImageView(MethodView):
@@ -30,9 +32,21 @@ class ImageView(MethodView):
         return flask.jsonify(count=count, images=images)
 
 
-    # update a single user
+    # update an image
     def patch(self, image_id):
-        pass
+        db = get_db()
+        cursor = db.cursor()
+
+        result = cursor.execute(
+           "UPDATE images SET categories = ? WHERE id = ?",
+           (json.dumps(flask.request.json['categories']), image_id, )
+        ).fetchone()
+
+        print 'hi', result
+
+        db.commit()
+
+        return flask.jsonify( { } )
 
 
     # create a new image
@@ -53,11 +67,21 @@ class ImageView(MethodView):
             flask.abort(422)
 
         device_id = flask.request.form['device_id']
+        result = flask.request.form['result']
+        motion = flask.request.form['motion']
+        ip_address = flask.request.remote_addr
+        created_at = datetime.datetime.now().isoformat()
 
-        image_id = add_image(
-            device_id=device_id, 
-            ip_address=flask.request.remote_addr
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute(
+           'INSERT INTO images (id, created_at, device_id, ip_address) VALUES (?, ?, ?)',
+           (created_at, device_id, ip_address)
         )
+
+        db.commit()
+        image_id = cursor.lastrowid
 
         filename = os.path.join(
             app.config['UPLOAD_FOLDER'],

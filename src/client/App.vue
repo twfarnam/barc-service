@@ -1,18 +1,25 @@
 <template>
   <div id="app">
+
     <h1>Barc Image Classifier</h1>
 
-    <div class="links">
-      <router-link v-if="prevLink" :to="prevLink">&larr; Previous Page</router-link>
-      <router-link v-if="nextLink" :to="nextLink">Next Page &rarr;</router-link>
-    </div>
+    <pagination-links
+      :prevLink=prevLink
+      :nextLink=nextLink
+    />
 
-    <image-record v-for="(image) in images" :key=image.id :image=image />
+    <image-record
+      v-for="(image) in images"
+      :key=image.id
+      :image=image
+      :addCategory="addCategory"
+      :removeCategory="removeCategory"
+    />
 
-    <div class="links">
-      <router-link v-if="prevLink" :to="prevLink">&larr; Previous Page</router-link>
-      <router-link v-if="nextLink" :to="nextLink">Next Page &rarr;</router-link>
-    </div>
+    <pagination-links
+      :prevLink=prevLink
+      :nextLink=nextLink
+    />
 
   </div>
 </template>
@@ -21,6 +28,7 @@
 <script>
 
 import ImageRecord from './components/ImageRecord'
+import PaginationLinks from './components/PaginationLinks'
 
 export default {
 
@@ -28,6 +36,7 @@ export default {
 
   components: {
     ImageRecord,
+    PaginationLinks,
   },
 
   data: () => ({
@@ -65,13 +74,49 @@ export default {
   methods: {
 
     async fetch() {
-      const response = await fetch(
-        '/api/images?from=' + (this.$route.params.pageStart || 0),
-        { credentials: 'same-origin' },
-      )
-      const { count, images } = await response.json()
-      this.images = images
-      this.count = count
+      try {
+        const response = await fetch(
+          '/api/images?from=' + (this.$route.params.pageStart || 0),
+          { credentials: 'same-origin' },
+        )
+        const { count, images } = await response.json()
+        this.images = images.map(i => (i.categories = [ ], i))
+        this.count = count
+      }
+      catch (error) {
+        console.error(error)
+        alert('An error has occurred. ' + error.message)
+      }
+    },
+
+    addCategory(id, category) {
+      const image = this.images.find(i => i.id === id)
+      image.categories.push(category)
+      this.saveImage(id)
+    },
+
+    removeCategory(id, category) {
+      const image = this.images.find(i => i.id === id)
+      image.categories = image.categories.filter(c => c != category)
+      this.saveImage(id)
+    },
+
+    async saveImage(id) {
+      try {
+        const image = this.images.find(i => i.id === id)
+        const response = await fetch('/api/images/' + id, {
+          credentials: 'same-origin',
+          method: 'PATCH',
+          body: JSON.stringify(image),
+          headers: { 'Content-Type' : 'application/json' }
+        })
+        const data = await response.json()
+        console.log(data)
+      }
+      catch (error) {
+        console.error(error)
+        alert('An error has occurred. ' + error.message)
+      }
     },
 
   }
@@ -88,14 +133,9 @@ export default {
     padding-bottom: 3em;
   }
 
-  .links a {
+  a {
     text-decoration: none;
   }
 
-  .links a + a {
-    margin-left: 3em;
-  }
-
 </style>
-
 

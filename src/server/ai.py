@@ -12,8 +12,6 @@ def classify_image(image_id):
     result = ai(filename)
     latency = int((time.time()- start) * 1000.0)
 
-    print 'AI found: %s with %.0f%% accuracy in %0.0f ms' % (result[0][1], result[0][0] * 100, latency)
-
     cursor.execute(
        "UPDATE images SET result = ?, latency = ? WHERE id = ?",
        (json.dumps(result), latency, image_id)
