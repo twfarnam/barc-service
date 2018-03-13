@@ -1,24 +1,30 @@
 
 To create a fresh databse:
 
-    FLASK_APP=service.py flask init_db
+    FLASK_APP=src/server/app.py flask init_db
 
 To upload images:
 
-    FLASK_APP=service.py flask init_images
+    FLASK_APP=src/server/app.py flask init_images
 
 To run in development mode:
 
-    FLASK_DEBUG=1 BARC_USERNAME=admin BARC_PASSWORD=secret ./service.py
+    npm start
+    FLASK_DEBUG=1 BARC_USERNAME=admin BARC_PASSWORD=secret ./src/server/app.py
 
-To do a test upload with CURL:
+Then open http://localhost:5001.
+
+To compile production JavaScript:
+    npm run build
+
+Test an upload with CURL:
 
     curl -F "file=@sloth.jpg" -F "device_id=test" -H "Authorization: Token token=secret" localhost:5000/api/images
 
-To run in production:
+Run in production:
 
     pip install -r requirements.txt
-    BARC_USERNAME=admin BARC_PASSWORD=secret python service.py
+    BARC_USERNAME=admin BARC_PASSWORD=secret ./src/server/app.py
 
 To test production service with a training file:
 
