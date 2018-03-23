@@ -7,5 +7,5 @@
       }
     }],
   ],
-  "plugins": [ "transform-vue-jsx", "transform-runtime" ],
+  "plugins": [ "transform-runtime" ],
 }

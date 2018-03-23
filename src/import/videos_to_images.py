@@ -4,9 +4,9 @@ import os
 from shutil import rmtree
 from subprocess import call
 
-this_dir = os.path.dirname(__file__)
-video_dir = os.path.normpath(this_dir + '/../../../import/videos')
-image_dir = os.path.normpath(this_dir + '/../../../import/images')
+root = os.path.normpath(os.path.dirname(__file__) + '../..')
+video_dir = os.path.join(root + 'import/videos')
+image_dir = os.path.join(root + 'import/images')
 
 if os.path.exists(image_dir):
     rmtree(image_dir)

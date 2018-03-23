@@ -1,13 +1,45 @@
 'use strict'
 const webpack = require('webpack')
-const merge = require('webpack-merge')
 const notifier = require('node-notifier')
 const path = require('path')
-const baseWebpackConfig = require('./webpack.base.conf')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 
 
-module.exports = merge(baseWebpackConfig, {
+module.exports = {
+
+  entry: {
+    app: './src/client/index.js'
+  },
+
+  resolve: {
+    alias: { vue: 'vue/dist/vue.js' }
+  },
+
+  output: {
+    filename: './static/app.js',
+  },
+
+  module: {
+
+    rules: [
+
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          cssSourceMap: true,
+          cacheBusting: false,
+        },
+      },
+
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        include: [ './src', './node_modules/webpack-dev-server/client' ]
+      },
+  
+    ]
+  },
 
   devtool: 'cheap-module-eval-source-map',
 
@@ -45,5 +77,5 @@ module.exports = merge(baseWebpackConfig, {
     })
   ],
 
-})
+}
 

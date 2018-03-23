@@ -1,7 +1,6 @@
+To import images that you just made:
 
-To create a fresh databse:
-
-    sqlite3 barc.db < src/server/schema.sql
+    python -m src.import.import_video_images
 
 To run in development mode:
 
