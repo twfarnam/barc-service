@@ -67,7 +67,7 @@ export default {
       if (meta.limit !== 10)
         query.push('limit=' + meta.limit)
 
-      return query.length ? '?' + query.join('&') : ''
+      return '?' + query.join('&')
     },
 
     changeSort(event) {
