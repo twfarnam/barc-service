@@ -1,7 +1,7 @@
 import os
 import json
 import datetime
-from PIL import Image as ImageFile
+from PIL import Image as PILImage
 from sqlalchemy import create_engine, inspect, Table, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -23,13 +23,13 @@ def now():
 def width(context):
     id = context.get_current_parameters()['id']
     filename = os.path.join(Image.DIR, id + '.jpg')
-    img = ImageFile.open(filename)
+    img = PILImage.open(filename)
     return img.size[0]
 
 def height(context):
     id = context.get_current_parameters()['id']
     filename = os.path.join(Image.DIR, id + '.jpg')
-    img = ImageFile.open(filename)
+    img = PILImage.open(filename)
     return img.size[1]
 
 
@@ -72,13 +72,11 @@ class Category(Base):
     __tablename__ = 'categories'
     id = Column(String, primary_key=True, default=newID)
     room = Column(String, nullable=False)
-    object = Column(String, nullable=False, unique=True)
+    object = Column(String, nullable=False)
 
     def dict(self):
         attrs = inspect(self).mapper.column_attrs
         return { c.key: getattr(self, c.key) for c in attrs }
-
-
 
 
 Base.metadata.create_all(engine)

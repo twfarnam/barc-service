@@ -5,7 +5,7 @@ import json
 from keras.models import load_model
 from keras.preprocessing.image import load_img, img_to_array
 from keras.applications.inception_v3 import preprocess_input
-from ..models import Session, Category, Image, newID
+from models import Session, Category, Image, newID
 from shutil import copyfile
 
 root = os.path.normpath(os.path.dirname(__file__) + '/../..')
@@ -25,7 +25,7 @@ for image in os.listdir(image_dir):
     if image.startswith('.'): continue
 
     src_path = os.path.join(image_dir, image)
-    print src_path
+    print(src_path)
 
     id = newID()
     image = Image(id=id)

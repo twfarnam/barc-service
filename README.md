@@ -4,16 +4,16 @@ To import videos from import/videos/<CATEGORY>/video.mp4:
 
 To run in development mode:
 
-    npm start
-
-And in a new shell:
-
     export FLASK_DEBUG=1 BARC_USERNAME=admin BARC_PASSWORD=secret
     ./src/app.py
 
-Then open http://localhost:5001
+Then open http://localhost:5000 in a browser. If you also need JavaScript
+changes via webpack, open a new shell and run:
 
-To compile production JavaScript:
+    npm start
+
+Then open http://localhost:5001 in the browser. To compile production
+JavaScript:
 
     npm run build
 
