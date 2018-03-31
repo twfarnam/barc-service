@@ -75,7 +75,7 @@ export default {
     },
 
     src() {
-      return `images/${ this.image.id }.jpg`
+      return `/static/images/${ this.image.id }.jpg`
     },
 
     shimStyle() {

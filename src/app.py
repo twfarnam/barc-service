@@ -20,7 +20,7 @@ def frontend():
     return flask.render_template('index.html')
 
 # this and static/ are served by nginx in production
-@app.route('/images/<path:path>')
+@app.route('/static/images/<path:path>')
 def send_images(path):
     return flask.send_from_directory('../images', path)
 
