@@ -74,6 +74,10 @@ class Category(Base):
     room = Column(String, nullable=False)
     object = Column(String, nullable=False)
 
+    @hybrid_property
+    def label(self):
+        return self.room + ' | ' + self.object
+
     def dict(self):
         attrs = inspect(self).mapper.column_attrs
         return { c.key: getattr(self, c.key) for c in attrs }

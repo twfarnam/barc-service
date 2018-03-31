@@ -84,12 +84,12 @@ class ImageView(MethodView):
         result = json.loads(flask.request.form['result'])
         labels = [ ]
         for r in result:
-            if r['confidence'] > .1: labels.append(r['label'])
+            if r['confidence'] > .3: labels.append(r['label'])
 
         if len(labels) > 0:
             image.categories = (
                 session.query(Category)
-                .filter(Category.object.in_(labels))
+                .filter(Category.label.in_(labels))
                 .all()
             )
 
