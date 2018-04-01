@@ -8,7 +8,7 @@ from keras.applications.inception_v3 import preprocess_input
 from models import Session, Category, Image, newID
 from shutil import copyfile
 
-root = os.path.normpath(os.path.dirname(__file__) + '/../..')
+root = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
 image_dir = os.path.join(root, 'import/uncategorized')
 model_path = os.path.join(root, 'model/inception.h5')
 labels_path = os.path.join(root, 'model/labels.json')
@@ -44,8 +44,6 @@ for image in os.listdir(image_dir):
                 .first()
             )
             if cat: image.categories.append(cat)
-
-    # images.categories.append( )
 
     copyfile(src_path, image.filename())
 

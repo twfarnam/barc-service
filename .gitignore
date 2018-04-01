@@ -3,7 +3,8 @@ barc.db
 *.pyc
 .DS_Store
 /images/
-/model/
 /node_modules/
 /import/
+barc.db-journal
+/model
 
