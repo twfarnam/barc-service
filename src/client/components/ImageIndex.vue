@@ -55,7 +55,7 @@ export default {
     async fetchCategories() {
       try {
         const response = await fetch(
-          '/api/categories',
+          location.origin + '/api/categories',
           { credentials: 'same-origin' },
         )
         const { data } = await response.json()
@@ -71,7 +71,7 @@ export default {
     async fetchImages() {
       try {
         const response = await fetch(
-          '/api/images' + window.location.search,
+          location.origin + '/api/images' + window.location.search,
           { credentials: 'same-origin' },
         )
         const { data, meta } = await response.json()
@@ -99,7 +99,8 @@ export default {
     async saveImage(id) {
       try {
         const image = this.images.find(i => i.id === id)
-        const response = await fetch('/api/images/' + id, {
+        const endpoint = location.origin + '/api/images/' + id
+        const response = await fetch(endpoint, {
           credentials: 'same-origin',
           method: 'PATCH',
           body: JSON.stringify(image),
