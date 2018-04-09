@@ -17,13 +17,15 @@ for room in os.listdir(video_dir):
     for obj in os.listdir(os.path.join(video_dir, room)):
         if obj.startswith('.'): continue
 
-        category = session.query(Category).filter(Category.object == obj).first()
-        print(category)
+        category = (
+            session.query(Category)
+            .filter(Category.room == room, Category.object == obj)
+            .first()
+        )
 
         if category == None:
             category = Category(room=room, object=obj)
             session.add(category)
-        print(category)
         session.commit()
 
 

@@ -69,6 +69,7 @@ export default {
 
 
     async fetchImages() {
+      this.images = [ ]
       try {
         const response = await fetch(
           location.origin + '/api/images' + window.location.search,
