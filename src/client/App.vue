@@ -3,8 +3,10 @@
 
     <h1>Barc Image Classifier</h1>
 
-    <router-link to="/images">View Images</router-link>
-    <router-link to="/objects">View Object List</router-link>
+    <nav>
+      <router-link to="/images">View Images</router-link>
+      <router-link to="/objects">View Object List</router-link>
+    </nav>
 
     <router-view />
 
@@ -30,6 +32,14 @@ export default {
     padding-bottom: 3em;
   }
 
+  #app > nav .router-link-active {
+    display: none;
+  }
+
+  #app > nav {
+    margin: 1rem 0;
+  }
+
   a {
     text-decoration: none;
     color: #999;
@@ -40,9 +50,7 @@ export default {
     color: inherit;
   }
 
-  .router-link-active {
-    display: none;
-  }
-
 </style>
+
+
 

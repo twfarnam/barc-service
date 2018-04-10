@@ -3,6 +3,8 @@
 
     <pagination-links :meta=meta />
 
+    <div class="loading" v-if="images.length === 0">Loading...</div>
+
     <image-row
       v-for="(image) in images"
       :key=image.id
@@ -119,3 +121,17 @@ export default {
 }
 
 </script>
+
+<style scpoed>
+
+  .loading {
+    font-size: 4vw;
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+</style>
+
+
