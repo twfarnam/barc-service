@@ -16,6 +16,7 @@ app.wsgi_app = AuthMiddleware(app.wsgi_app)
 
 @app.route('/')
 @app.route('/images')
+@app.route('/categories')
 def frontend():
     return flask.render_template('index.html')
 

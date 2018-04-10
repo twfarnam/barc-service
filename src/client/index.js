@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import App from './App.vue'
 import ImageIndex from './components/ImageIndex.vue'
+import CategoryIndex from './components/CategoryIndex.vue'
 
 Vue.config.productionTip = false
 
@@ -12,6 +13,7 @@ var router = new VueRouter({
   routes: [
     { path: '/', redirect: '/images' },
     { path: '/images', component: ImageIndex },
+    { path: '/categories', component: CategoryIndex },
   ],
   scrollBehavior(to, from, savedPosition) {
     return { x: 0, y: 0 }
