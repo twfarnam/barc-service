@@ -13,7 +13,7 @@ var router = new VueRouter({
   routes: [
     { path: '/', redirect: '/images' },
     { path: '/images', component: ImageIndex },
-    { path: '/categories', component: CategoryIndex },
+    { path: '/objects', component: CategoryIndex },
   ],
   scrollBehavior(to, from, savedPosition) {
     return { x: 0, y: 0 }

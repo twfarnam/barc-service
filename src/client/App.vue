@@ -4,7 +4,7 @@
     <h1>Barc Image Classifier</h1>
 
     <router-link to="/images">View Images</router-link>
-    <router-link to="/categories">View Categories</router-link>
+    <router-link to="/objects">View Object List</router-link>
 
     <router-view />
 
