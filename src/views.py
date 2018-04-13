@@ -1,5 +1,6 @@
 import flask
 import json
+import datetime
 from flask.views import MethodView
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
@@ -38,6 +39,7 @@ class ImageView(MethodView):
 
         images = (
             session.query(Image)
+            .filter(Image.deleted_at == None)
             .order_by(order)
             .limit(meta['limit'])
             .offset(meta['offset'])
@@ -46,6 +48,14 @@ class ImageView(MethodView):
 
         return flask.jsonify(meta=meta, data=[ r.dict() for r in images ])
 
+    # update an image's categories
+    def delete(self, image_id):
+        session = Session()
+        image = session.query(Image).get(image_id)
+        image.deleted_at = datetime.datetime.now().isoformat()
+        print("\n\n==========> yeah!\n\n", image.deleted_at)
+        session.commit()
+        return '', 200
 
     # update an image's categories
     def patch(self, image_id):

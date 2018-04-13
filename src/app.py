@@ -40,7 +40,7 @@ app.add_url_rule(
 app.add_url_rule(
     '/api/images/<image_id>',
     view_func=image_view,
-    methods=[ 'PATCH' ]
+    methods=[ 'PATCH', 'DELETE' ]
 )
 
 if __name__ == '__main__':

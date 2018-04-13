@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <select @change="add">
+      <select @change=add>
         <option value="">add category...</option>
         <optgroup v-for="(categories, room) in categoriesByRoom" :label="room">
           <option v-for="(object, id) in categories" :value="id">
@@ -44,6 +44,11 @@
           </option>
         </optgroup>
       </select>
+
+      <br>
+      <button class=delete @click=del>
+        Delete
+      </button>
 
     </div>
 
@@ -56,7 +61,13 @@ export default {
 
   name: 'ImageRow',
 
-  props: [ 'image', 'categories', 'addCategory', 'removeCategory' ],
+  props: [
+    'image',
+    'categories',
+    'addCategory',
+    'removeCategory',
+    'deleteImage',
+  ],
 
   computed: {
 
@@ -116,6 +127,10 @@ export default {
     remove(id) {
       this.removeCategory(this.image.id, id)
     },
+
+    del() {
+      this.deleteImage(this.image.id)
+    }
 
   },
 
@@ -188,6 +203,16 @@ export default {
   select {
     font-size: 1.3em;
     text-transform: capitalize;
+  }
+
+  button.delete {
+    font-size: 1.1rem;
+    border: none;
+    background-color: hsl(0, 86%, 54%);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.2rem;
+    cursor: pointer;
   }
 
 </style>

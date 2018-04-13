@@ -12,6 +12,7 @@
       :categories=categories
       :addCategory=addCategory
       :removeCategory=removeCategory
+      :deleteImage=deleteImage
     />
 
     <pagination-links :meta=meta />
@@ -49,7 +50,10 @@ export default {
   },
 
   watch: {
-    '$route'() { this.fetchImages() }
+    '$route'() {
+      this.images = [ ]
+      this.fetchImages()
+    }
   },
 
   methods: {
@@ -69,9 +73,7 @@ export default {
       }
     },
 
-
     async fetchImages() {
-      this.images = [ ]
       try {
         const response = await fetch(
           location.origin + '/api/images' + window.location.search,
@@ -113,6 +115,24 @@ export default {
       catch (error) {
         console.error(error)
         alert('An error has occurred. ' + error.message)
+      }
+    },
+
+
+    async deleteImage(id) {
+      const endpoint = location.origin + '/api/images/' + id
+      const options = {
+        credentials: 'same-origin',
+        method: 'DELETE',
+      }
+      try {
+        this.images = this.images.filter(i => i.id !== id)
+        const response = await fetch(endpoint, options)
+        this.fetchImages()
+
+      }
+      catch (error) {
+        alert('delete error', error.message)
       }
     },
 

@@ -50,6 +50,7 @@ class Image(Base):
     width = Column(Integer, nullable=False, default=width)
     height = Column(Integer, nullable=False, default=height)
     created_at = Column(String, nullable=False, index=True, default=now)
+    deleted_at = Column(String, index=True)
     result = Column(String)
     motion = Column(String)
     device_id = Column(String)
