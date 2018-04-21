@@ -22,7 +22,7 @@
           </tr>
         </tbody>
       </table>
-      <div>No classifications</div>
+      <div v-else>No classifications</div>
 
       <div v-if=image.motion><b>Motion</b> {{ motion }}</div>
       <div class=time><b>Time</b> {{ time }}</div>

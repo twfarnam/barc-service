@@ -24,9 +24,11 @@ class ImageView(MethodView):
     def get(self):
         session = Session()
 
+        count = session.query(Image).filter(Image.deleted_at == None).count()
+
         # XXX must do some kind of checking of those parameters
         meta = {
-            'count': session.query(Image).count(),
+            'count': count,
             'order': flask.request.args.get('order', 'created_at desc'),
             'offset': int(flask.request.args.get('offset', 0)),
             'limit': int(flask.request.args.get('limit', 10)),
@@ -48,6 +50,7 @@ class ImageView(MethodView):
 
         return flask.jsonify(meta=meta, data=[ r.dict() for r in images ])
 
+
     # update an image's categories
     def delete(self, image_id):
         session = Session()
@@ -56,6 +59,7 @@ class ImageView(MethodView):
         print("\n\n==========> yeah!\n\n", image.deleted_at)
         session.commit()
         return '', 200
+
 
     # update an image's categories
     def patch(self, image_id):
@@ -79,10 +83,8 @@ class ImageView(MethodView):
 
         session = Session()
 
-        image_id = newID()
-
         image = Image(
-            id=image_id,
+            id=newID(),
             device_id=flask.request.form['device_id'],
             result=flask.request.form['result'],
             motion=flask.request.form['motion'],
@@ -91,9 +93,8 @@ class ImageView(MethodView):
 
         flask.request.files['file'].save(image.filename())
 
-        result = json.loads(flask.request.form['result'])
         labels = [ ]
-        for r in result:
+        for r in json.loads(image.result):
             if r['confidence'] > .3: labels.append(r['label'])
 
         if len(labels) > 0:
