@@ -1,5 +1,6 @@
 
 barc.db
+barc.db.bak
 *.pyc
 .DS_Store
 /images/

@@ -1,9 +1,7 @@
-#! /usr/bin/env python3
-
 import flask
-from views import ImageView, CategoryView
-from models import Image
-from auth import AuthMiddleware
+from .views import ImageView, CategoryView
+from .models import Image
+from .auth import AuthMiddleware
 
 
 app = flask.Flask(
@@ -20,7 +18,8 @@ app.wsgi_app = AuthMiddleware(app.wsgi_app)
 def frontend():
     return flask.render_template('index.html')
 
-# this and static/ are served by nginx in production
+# this and static_folder served directly by nginx in production (n.b. without
+# authentication but UUID image names should prevent scraping)
 @app.route('/static/images/<path:path>')
 def send_images(path):
     return flask.send_from_directory('../images', path)
@@ -29,7 +28,6 @@ app.add_url_rule(
     '/api/categories',
     view_func=CategoryView.as_view('category_view')
 )
-
 
 image_view = ImageView.as_view('image_view')
 app.add_url_rule(
@@ -42,7 +40,4 @@ app.add_url_rule(
     view_func=image_view,
     methods=[ 'PATCH', 'DELETE' ]
 )
-
-if __name__ == '__main__':
-    app.run(port=5000, host='0.0.0.0')
 

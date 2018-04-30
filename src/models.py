@@ -36,8 +36,8 @@ def height(context):
 images_categories_table = Table(
     'images_categories',
     Base.metadata,
-    Column('image_id', Integer, ForeignKey('images.id')),
-    Column('category_id', Integer, ForeignKey('categories.id'))
+    Column('image_id', String, ForeignKey('images.id'), index=True),
+    Column('category_id', String, ForeignKey('categories.id'), index=True)
 )
 
 
@@ -82,7 +82,6 @@ class Category(Base):
     def dict(self):
         attrs = inspect(self).mapper.column_attrs
         return { c.key: getattr(self, c.key) for c in attrs }
-
 
 Base.metadata.create_all(engine)
 

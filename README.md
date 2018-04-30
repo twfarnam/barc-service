@@ -21,5 +21,5 @@ Run it in production (with the correct username and password, of course):
 
     pip install -r requirements.txt
     export BARC_USERNAME=admin BARC_PASSWORD=secret
-    ./src/app.py
+    ./barc.py serve
 
