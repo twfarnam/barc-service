@@ -10,6 +10,7 @@ def run(architecture):
         session.query(Image)
         .filter(Image.deleted_at == None)
         .order_by('created_at DESC')
+        .limit(500)
     )
 
     model = load_model(architecture)
@@ -22,15 +23,12 @@ def run(architecture):
 
         result = [ ]
         for i, confidence in enumerate(prediction):
-
-            if float(confidence) > .05:
-                result.append({
-                    'confidence' : float(confidence),
-                    'label' : labels[i],
-                })
+            result.append({
+                'confidence' : float(confidence),
+                'label' : labels[i],
+            })
 
         sorted_result = sorted(result, key=lambda r: -r['confidence'])
-        print('RESULT', sorted_result)
         image.result = json.dumps(sorted_result)
 
         session.commit()

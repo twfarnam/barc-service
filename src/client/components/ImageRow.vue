@@ -15,7 +15,7 @@
           <th>Confidence</th>
         </thead>
         <tbody>
-          <tr v-for="(row, i) in this.image.result"
+          <tr v-for="(row, i) in this.image.result.slice(0,10)"
             :class="{ spoken: i == 0 && row.confidence > .5 }">
             <td>{{ row.label }}</td>
             <td>{{ Math.round(row.confidence * 100) }}%</td>
@@ -24,6 +24,7 @@
       </table>
       <div v-else>No classifications</div>
 
+      <div><b>ID</b> {{ image.id }}</div>
       <div v-if=image.motion><b>Motion</b> {{ motion }}</div>
       <div class=time><b>Time</b> {{ time }}</div>
       <div v-if=image.ip_address><b>IP</b> {{ image.ip_address }}</div>

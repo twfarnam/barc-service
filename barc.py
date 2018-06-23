@@ -49,17 +49,8 @@ elif args.command == 'recategorize':
     from src.recategorize import run
     run(args.architecture[0])
 elif args.command == 'categorize':
-    from src.neural_net import load_model, load_image, labels
-    model = load_model(args.architecture[0])
-    for path in args.image:
-        prediction = model.predict(load_image(path, args.architecture[0]))[0]
-        result = [ ]
-        for i, confidence in enumerate(prediction):
-            if float(confidence) > .05:
-                result.append(( labels[i], float(confidence), ))
-        sorted_result = sorted(result, key=lambda r: -r[1])
-        for (label, confidence) in sorted_result:
-            print("{:<35}{:.0%}".format(label, confidence))
+    from src.categorize import run
+    run(args.architecture[0], args.image)
 elif args.command == 'import-uncategorized':
     from src.import_uncategorized import run
     run(args.architecture[0])
